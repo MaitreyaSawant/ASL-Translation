@@ -9,14 +9,13 @@ import mediapipe as mp
 import cv2 as cv
 import pickle
 
-# Constants
 DATA_PATH = os.path.join('MP_Data')
 actions = np.array(['hello', 'thanks', 'iloveyou'])
 no_sequences = 30
 sequence_length = 30
 label_map = {label: num for num, label in enumerate(actions)}
 
-# Load data
+
 sequences, labels = [], []
 for action in actions:
     for sequence in range(no_sequences):
@@ -32,7 +31,7 @@ y = to_categorical(labels).astype(int)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.05, stratify=y)
 
-# Model
+
 model = Sequential()
 model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 1662)))
 model.add(LSTM(128, return_sequences=True, activation='relu'))
@@ -41,19 +40,18 @@ model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(actions.shape[0], activation='softmax'))
 
-# Uncomment to train the model
-# model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-# model.fit(x_train, y_train, epochs=140)
 
-# Save the model
-# with open('modelLS.p', 'wb') as f:
-#     pickle.dump({'model': model}, f)
-# model.save('action.h5')
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+model.fit(x_train, y_train, epochs=140)
 
-# Load the model weights
+with open('modelLS.p', 'wb') as f:
+    pickle.dump({'model': model}, f)
+model.save('action.h5')
+
+
 model.load_weights('action.h5')
 
-# Predictions
+
 res = model.predict(x_test)
 print(actions[np.argmax(res[1])])
 print(actions[np.argmax(y_test[1])])
@@ -65,7 +63,7 @@ yhat = np.argmax(yhat, axis=1).tolist()
 print(multilabel_confusion_matrix(ytrue, yhat))
 print(accuracy_score(ytrue, yhat))
 
-# Mediapipe functions
+
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
 
@@ -100,7 +98,7 @@ def prob_viz(res, actions, input_frame, colors):
         cv.rectangle(output_frame, (0, 60 + num * 40), (int(prob * 100), 90 + num * 40), colors[num], -1)
     return output_frame
 
-# Real-time detection
+
 sequence = []
 sentence = []
 predictions=[]
