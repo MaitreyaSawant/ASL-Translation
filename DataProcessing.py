@@ -43,13 +43,13 @@ model.add(Dense(64,activation='relu'))
 model.add(Dense(32,activation='relu'))
 model.add(Dense(actions.shape[0],activation='softmax'))
 
-# model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['categorical_accuracy'])
-# model.fit(x_train,y_train,epochs=140)
-#
-# with open('modelLS.p','wb') as f:
-#       pickle.dump({'model':model},f)
-#
-# model.save('action.h5')
+model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['categorical_accuracy'])
+model.fit(x_train,y_train,epochs=140)
+
+with open('modelLS.p','wb') as f:
+      pickle.dump({'model':model},f)
+
+model.save('action.h5')
 model.load_weights('action.h5')
 
 yhat=model.predict(x_test)
